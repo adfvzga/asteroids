@@ -18,6 +18,9 @@ def main():
     pygame.init()
     font = pygame.font.Font(None, 36)
 
+    # Load the background picture
+    background_surface = pygame.image.load('background_image.png')
+
     # Generate object containers 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
@@ -47,9 +50,6 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 
-            
-        # Draw the screen
-        screen.fill("black")
 
         # Update the positions of objects 
         updatable.update(dt)
@@ -79,6 +79,9 @@ def main():
                     shot.kill()
                     asteroid.split()
 
+        # Draw the screen
+        screen.blit(background_surface, (0, 0))
+
         # Draw drawable stuff 
         for drawable_item in drawable:
             drawable_item.draw(screen)
@@ -89,6 +92,7 @@ def main():
         screen.blit(score_surface, (20, 20))
         screen.blit(lives_surface, (20, 50))
 
+        # Update the screen 
         pygame.display.flip()
 
         # Wait 1/60 of a second before proceeding with the new frame
