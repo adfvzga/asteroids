@@ -27,7 +27,21 @@ class Player(CircleShape):
         unit_vector = pygame.Vector2(0,1)
         rotated_vector = unit_vector.rotate(self.rotation)
         movement_increment = rotated_vector * PLAYER_SPEED * dt
-        self.position += movement_increment
+        # X cordinate update 
+        if self.position.x > SCREEN_WIDTH + self.radius:
+            self.position.x -= SCREEN_WIDTH
+        elif self.position.x < 0 - self.radius:
+            self.position.x += SCREEN_WIDTH
+        else:
+            self.position.x += movement_increment.x
+
+        # Y cordinate update 
+        if self.position.y > SCREEN_HEIGHT + self.radius:
+            self.position.y -= SCREEN_HEIGHT
+        elif self.position.y < 0 - self.radius:
+            self.position.y += SCREEN_HEIGHT
+        else:
+            self.position.y += movement_increment.y
 
     def shoot(self):
         if (self.cooldown_timer > 0):
