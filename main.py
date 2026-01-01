@@ -16,6 +16,7 @@ def main():
     print(f"Screen height: {SCREEN_HEIGHT}")
 
     pygame.init()
+    font = pygame.font.Font(None, 36)
 
     # Generate object containers 
     updatable = pygame.sprite.Group()
@@ -33,6 +34,9 @@ def main():
     player = Player(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
     asteroid_field = AsteroidField()
     dt = 0
+
+    # Gameplay variables
+    player_score = 0
 
     while(1):
         # Log game state at the beggining of each frame 
@@ -60,12 +64,19 @@ def main():
         for asteroid in asteroids:
             for shot in shots:
                 if asteroid.collides_with(shot):
+                    player_score += 1
                     log_event("asteroid_shot")
                     shot.kill()
                     asteroid.split()
 
+        # Draw drawable stuff 
         for drawable_item in drawable:
             drawable_item.draw(screen)
+        
+        # Draw score
+        score_surface = font.render(f"Score: {player_score}", True, (255, 255, 255))
+        screen.blit(score_surface, (20, 20))
+
         pygame.display.flip()
 
         # Wait 1/60 of a second before proceeding with the new frame
