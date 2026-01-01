@@ -37,6 +37,7 @@ def main():
 
     # Gameplay variables
     player_score = 0
+    player_lives = 3
 
     while(1):
         # Log game state at the beggining of each frame 
@@ -56,9 +57,14 @@ def main():
         # Do collision detection on player vs asteroids
         for asteroid in asteroids:
             if asteroid.collides_with(player):
-                log_event("player_hit")
-                print("Game over!")
-                sys.exit()
+                if player_lives == 1:
+                    log_event("player_hit")
+                    print("Game over!")
+                    sys.exit()
+                else:
+                    player_lives -= 1
+                    asteroid.kill()
+                    # print("lost life") # DEBUG ONLY
 
         # Do collision detection on asteroids vs shots
         for asteroid in asteroids:
@@ -73,9 +79,11 @@ def main():
         for drawable_item in drawable:
             drawable_item.draw(screen)
         
-        # Draw score
+        # Draw score and lives
         score_surface = font.render(f"Score: {player_score}", True, (255, 255, 255))
+        lives_surface = font.render(f"Lives: {player_lives}", True, (255, 255, 255))
         screen.blit(score_surface, (20, 20))
+        screen.blit(lives_surface, (20, 50))
 
         pygame.display.flip()
 
