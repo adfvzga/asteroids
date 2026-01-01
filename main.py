@@ -63,7 +63,11 @@ def main():
                     sys.exit()
                 else:
                     player_lives -= 1
-                    asteroid.kill()
+                    for asteroid in asteroids:
+                        asteroid.kill()
+                    player.rotation = 0
+                    player.position.x = SCREEN_WIDTH/2
+                    player.position.y = SCREEN_HEIGHT/2
                     # print("lost life") # DEBUG ONLY
 
         # Do collision detection on asteroids vs shots
