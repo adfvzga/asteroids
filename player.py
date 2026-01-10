@@ -64,6 +64,8 @@ class Player(CircleShape):
             self.cooldown_timer = PLAYER_SHOOT_COOLDOWN_SECONDS
 
     def update(self, dt):
+        # Helper variables
+        user_applying_rotational_acceleration = False
         # Update the cooldown timer
         self.cooldown_timer -= dt
 
@@ -71,8 +73,10 @@ class Player(CircleShape):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
             self.accelerate_rotationally(-dt)
+            user_applying_rotational_acceleration = True
         if keys[pygame.K_d]:
             self.accelerate_rotationally(dt)
+            user_applying_rotational_acceleration = True
         if keys[pygame.K_w]:
             self.move(dt)
         if keys[pygame.K_s]:
@@ -81,4 +85,7 @@ class Player(CircleShape):
             self.shoot()
 
         # Calculate the current rotation
+        # Take environmental drag into account
+        if user_applying_rotational_acceleration is False: 
+            self.rotational_speed *= PLAYER_ROTATIONAL_DRAG_DECELEARTION_COEFFICIENT
         self.rotation += self.rotational_speed * dt
