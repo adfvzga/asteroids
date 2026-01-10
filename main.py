@@ -66,6 +66,7 @@ def main():
                     for asteroid in asteroids:
                         asteroid.kill()
                     player.rotation = 0
+                    player.rotational_speed = 0
                     player.position.x = SCREEN_WIDTH/2
                     player.position.y = SCREEN_HEIGHT/2
                     # print("lost life") # DEBUG ONLY

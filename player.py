@@ -7,6 +7,7 @@ class Player(CircleShape):
     def __init__(self, x, y):
         super().__init__(x,y,PLAYER_RADIUS)
         self.rotation = 0
+        self.rotational_speed = 0
         self.cooldown_timer = 0
 
     def triangle(self):
@@ -20,8 +21,17 @@ class Player(CircleShape):
     def draw(self, screen):
         pygame.draw.polygon(screen, "purple", self.triangle(), LINE_WIDTH)
 
-    def rotate(self, dt):
-        self.rotation += PLAYER_TURN_SPEED * dt
+    def accelerate_rotationally(self, dt):
+        if dt > 0:
+            if self.rotational_speed < PLAYER_MAX_ROTATION_SPEED:
+                self.rotational_speed += PLAYER_ROTATIONAL_ACCELERATION * dt
+            else:
+                self.rotational_speed = PLAYER_ROTATIONAL_ACCELERATION
+        else:
+            if self.rotational_speed > -PLAYER_MAX_ROTATION_SPEED:
+                self.rotational_speed += PLAYER_ROTATIONAL_ACCELERATION * dt
+            else:
+                self.rotational_speed = -PLAYER_ROTATIONAL_ACCELERATION
 
     def move(self, dt):
         unit_vector = pygame.Vector2(0,1)
@@ -54,15 +64,21 @@ class Player(CircleShape):
             self.cooldown_timer = PLAYER_SHOOT_COOLDOWN_SECONDS
 
     def update(self, dt):
+        # Update the cooldown timer
         self.cooldown_timer -= dt
+
+        # Check current player input and make adjustments
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
-            self.rotate(-dt)
+            self.accelerate_rotationally(-dt)
         if keys[pygame.K_d]:
-            self.rotate(dt)
+            self.accelerate_rotationally(dt)
         if keys[pygame.K_w]:
             self.move(dt)
         if keys[pygame.K_s]:
             self.move(-dt)
         if keys[pygame.K_SPACE]:
             self.shoot()
+
+        # Calculate the current rotation
+        self.rotation += self.rotational_speed * dt
