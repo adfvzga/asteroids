@@ -69,6 +69,7 @@ def main():
                     player.rotational_speed = 0
                     player.position.x = SCREEN_WIDTH/2
                     player.position.y = SCREEN_HEIGHT/2
+                    player.speed = 0
                     # print("lost life") # DEBUG ONLY
 
         # Do collision detection on asteroids vs shots
@@ -90,8 +91,12 @@ def main():
         # Draw score and lives
         score_surface = font.render(f"Score: {player_score}", True, (255, 255, 255))
         lives_surface = font.render(f"Lives: {player_lives}", True, (255, 255, 255))
+        player_speed_surface = font.render(f"Player speed: {player.speed:.2f}", True, (255, 255, 255))
+        player_rotational_speed_surface = font.render(f"Player rotational speed: {player.rotational_speed:.2f}", True, (255, 255, 255))
         screen.blit(score_surface, (20, 20))
         screen.blit(lives_surface, (20, 50))
+        screen.blit(player_speed_surface, (20, 80))
+        screen.blit(player_rotational_speed_surface, (20, 110))
 
         # Update the screen 
         pygame.display.flip()
