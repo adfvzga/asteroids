@@ -2,14 +2,19 @@ import pygame
 from circleshape import CircleShape
 from shot import Shot
 from constants import *
+import random
 
 class Player(CircleShape):
     def __init__(self, x, y):
         super().__init__(x,y,PLAYER_RADIUS)
+        # Player position 
         self.rotation = 0
         self.speed = 0
         self.rotational_speed = 0
-        self.cooldown_timer = 0
+
+        # Armament
+        self.autocannon_magazine = AUTOCANNON_MAGAZINE_CAPACITY
+        self.shotgun_magazine = SHOTGUN_MAGAZINE_CAPACITY
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -46,22 +51,27 @@ class Player(CircleShape):
             else:
                 self.speed = -PLAYER_MAX_SPEED
 
-    def shoot(self):
-        if (self.cooldown_timer > 0):
-            pass
-        else:
-            shot = Shot(self.position.x, self.position.y, SHOT_RADIUS)
+    def shoot_autocannon(self):
+        if self.autocannon_magazine != 0:
+            shot = Shot(self.position.x, self.position.y, AUTOCANNON_PROJECTILE_RADIUS)
             shot.velocity = pygame.Vector2(0,1)
             shot.velocity = shot.velocity.rotate(self.rotation)
-            shot.velocity *= PLAYER_SHOOT_SPEED + self.speed
-            self.cooldown_timer = PLAYER_SHOOT_COOLDOWN_SECONDS
+            shot.velocity *= AUTOCANNON_PROJECTILE_SPEED + self.speed
+            self.autocannon_magazine -= 1
+        
+    def shoot_shotgun(self):
+        if self.shotgun_magazine != 0:
+            for i in range(0, SHOTGUN_PELLETS_PER_SHOT):
+                shot = Shot(self.position.x, self.position.y, SHOTGUN_PROJECTILE_RADIUS)
+                shot.velocity = pygame.Vector2(0,1)
+                shot.velocity = shot.velocity.rotate(self.rotation + random.randint(-45, 45))
+                shot.velocity *= SHOTGUN_PROJECTILE_SPEED + self.speed + random.randint(-50, 50)
+            self.shotgun_magazine -= 1
 
     def update(self, dt):
         # Helper variables
         user_applying_rotational_acceleration = False
         user_applying_linear_acceleration = False
-        # Update the cooldown timer
-        self.cooldown_timer -= dt
 
         # Check current player input and make adjustments
         keys = pygame.key.get_pressed()
@@ -77,8 +87,11 @@ class Player(CircleShape):
         if keys[pygame.K_s]:
             self.accelerate_linearly(-dt)
             user_applying_linear_acceleration = True 
+        if keys[pygame.K_j]:
+            self.shoot_shotgun()
         if keys[pygame.K_SPACE]:
-            self.shoot()
+            self.shoot_autocannon()
+
 
         # Calculate the current rotation
         # Take environmental drag into account

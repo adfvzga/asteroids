@@ -1,5 +1,5 @@
 import pygame
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT
+from constants import *
 from logger import log_state, log_event
 from player import Player
 from asteroid import Asteroid
@@ -70,6 +70,8 @@ def main():
                     player.position.x = SCREEN_WIDTH/2
                     player.position.y = SCREEN_HEIGHT/2
                     player.speed = 0
+                    player.autocannon_magazine = AUTOCANNON_MAGAZINE_CAPACITY
+                    player.shotgun_magazine = SHOTGUN_MAGAZINE_CAPACITY
                     # print("lost life") # DEBUG ONLY
 
         # Do collision detection on asteroids vs shots
@@ -91,12 +93,16 @@ def main():
         # Draw score and lives
         score_surface = font.render(f"Score: {player_score}", True, (255, 255, 255))
         lives_surface = font.render(f"Lives: {player_lives}", True, (255, 255, 255))
-        player_speed_surface = font.render(f"Player speed: {player.speed:.2f}", True, (255, 255, 255))
-        player_rotational_speed_surface = font.render(f"Player rotational speed: {player.rotational_speed:.2f}", True, (255, 255, 255))
+        player_speed_surface = font.render(f"LIN SPD: {player.speed:.2f}", True, (255, 255, 255))
+        player_rotational_speed_surface = font.render(f"ROT SPD: {player.rotational_speed:.2f}", True, (255, 255, 255))
+        autocannon_rounds_surface = font.render(f"ATCN: {player.autocannon_magazine}", True, (255, 255, 255))
+        shotgun_rounds_surface = font.render(f"SHTGN: {player.shotgun_magazine}", True, (255, 255, 255))
         screen.blit(score_surface, (20, 20))
         screen.blit(lives_surface, (20, 50))
         screen.blit(player_speed_surface, (20, 80))
         screen.blit(player_rotational_speed_surface, (20, 110))
+        screen.blit(autocannon_rounds_surface, (20, 140))
+        screen.blit(shotgun_rounds_surface, (20, 170))
 
         # Update the screen 
         pygame.display.flip()
