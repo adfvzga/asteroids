@@ -15,6 +15,9 @@ class Player(CircleShape):
         # Armament
         self.autocannon_magazine = AUTOCANNON_MAGAZINE_CAPACITY
         self.shotgun_magazine = SHOTGUN_MAGAZINE_CAPACITY
+        self.shotgun_cooldown = 0
+        self.autocannon_reload_timer = 0 
+        self.shotgun_reload_timer = 0
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -58,20 +61,41 @@ class Player(CircleShape):
             shot.velocity = shot.velocity.rotate(self.rotation)
             shot.velocity *= AUTOCANNON_PROJECTILE_SPEED + self.speed
             self.autocannon_magazine -= 1
+        else:
+            self.autocannon_reload_timer = AUTOCANNON_RELOAD_TIME_SECONDS
         
     def shoot_shotgun(self):
         if self.shotgun_magazine != 0:
-            for i in range(0, SHOTGUN_PELLETS_PER_SHOT):
-                shot = Shot(self.position.x, self.position.y, SHOTGUN_PROJECTILE_RADIUS)
-                shot.velocity = pygame.Vector2(0,1)
-                shot.velocity = shot.velocity.rotate(self.rotation + random.randint(-45, 45))
-                shot.velocity *= SHOTGUN_PROJECTILE_SPEED + self.speed + random.randint(-50, 50)
-            self.shotgun_magazine -= 1
+                if self.shotgun_cooldown > 0:
+                    pass
+                else:
+                    for i in range(0, SHOTGUN_PELLETS_PER_SHOT):
+                        shot = Shot(self.position.x, self.position.y, SHOTGUN_PROJECTILE_RADIUS)
+                        shot.velocity = pygame.Vector2(0,1)
+                        shot.velocity = shot.velocity.rotate(self.rotation + random.randint(-25, 25))
+                        shot.velocity *= SHOTGUN_PROJECTILE_SPEED + self.speed + random.randint(-50, 50)
+                    self.shotgun_magazine -= 1
+                    self.shotgun_cooldown = SHOTGUN_COOLDOWN_TIME_SECONDS
+        else:
+            self.shotgun_reload_timer = SHOTGUN_RELOAD_TIME_SECONDS
 
     def update(self, dt):
         # Helper variables
         user_applying_rotational_acceleration = False
         user_applying_linear_acceleration = False
+
+        # Update cooldown and reload timers
+        self.shotgun_cooldown -= dt
+
+        if self.autocannon_reload_timer > 0:
+            self.autocannon_reload_timer -= dt
+            if self.autocannon_reload_timer <= 0:
+                self.autocannon_magazine = AUTOCANNON_MAGAZINE_CAPACITY
+
+        if self.shotgun_reload_timer > 0:
+            self.shotgun_reload_timer -= dt
+            if self.shotgun_reload_timer <= 0:
+                self.shotgun_magazine = SHOTGUN_MAGAZINE_CAPACITY
 
         # Check current player input and make adjustments
         keys = pygame.key.get_pressed()
