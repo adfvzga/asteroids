@@ -4,13 +4,16 @@ from shot import Shot
 from constants import *
 import random
 
+
 class Player(CircleShape):
-    def __init__(self, x, y):
+    def __init__(self, x, y, autocannon_snd, shotgun_snd):
         super().__init__(x,y,PLAYER_RADIUS)
         # Player position 
         self.rotation = 0
         self.speed = 0
         self.rotational_speed = 0
+        self.autocannon_snd = autocannon_snd
+        self.shotgun_snd = shotgun_snd
 
         # Armament
         self.autocannon_magazine = AUTOCANNON_MAGAZINE_CAPACITY
@@ -61,6 +64,7 @@ class Player(CircleShape):
             shot.velocity = shot.velocity.rotate(self.rotation)
             shot.velocity *= AUTOCANNON_PROJECTILE_SPEED + self.speed
             self.autocannon_magazine -= 1
+            self.autocannon_snd.play()
         else:
             self.autocannon_reload_timer = AUTOCANNON_RELOAD_TIME_SECONDS
         
@@ -76,6 +80,7 @@ class Player(CircleShape):
                         shot.velocity *= SHOTGUN_PROJECTILE_SPEED + self.speed + random.randint(-50, 50)
                     self.shotgun_magazine -= 1
                     self.shotgun_cooldown = SHOTGUN_COOLDOWN_TIME_SECONDS
+                    self.shotgun_snd.play()
         else:
             self.shotgun_reload_timer = SHOTGUN_RELOAD_TIME_SECONDS
 

@@ -6,6 +6,7 @@ from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from shot import Shot
 import sys
+import os
 
 
 
@@ -15,11 +16,23 @@ def main():
     print(f"Screen width: {SCREEN_WIDTH}")
     print(f"Screen height: {SCREEN_HEIGHT}")
 
+    # Initialize all relevant modules
     pygame.init()
+    if "SDL_AUDIODRIVER" not in os.environ:
+        os.environ["SDL_AUDIODRIVER"] = "pulse" 
+    pygame.mixer.init()
+    pygame.mixer.set_num_channels(16)
     font = pygame.font.Font(None, 36)
 
     # Load the background picture
     background_surface = pygame.image.load('background_image.png')
+
+    # Load the sounds
+    autocannon_snd = pygame.mixer.Sound("autocannon.wav")
+    shotgun_snd = pygame.mixer.Sound("shotgun.mp3")
+
+    autocannon_snd.set_volume(0.25)
+    shotgun_snd.set_volume(0.35)
 
     # Generate object containers 
     updatable = pygame.sprite.Group()
@@ -34,7 +47,7 @@ def main():
      
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
-    player = Player(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
+    player = Player(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, autocannon_snd, shotgun_snd)
     asteroid_field = AsteroidField()
     dt = 0
 
