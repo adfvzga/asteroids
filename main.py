@@ -55,25 +55,25 @@ def main():
         updatable.update(dt)
 
         # Do collision detection on player vs asteroids
-        # for asteroid in asteroids:
-        #     if asteroid.collides_with(player):
-        #         if player_lives == 1:
-        #             log_event("player_hit")
-        #             print("Game over!")
-        #             sys.exit()
-        #         else:
-        #             player_lives -= 1
-        #             for asteroid in asteroids:
-        #                 asteroid.kill()
-        #             player.rotation = 0
-        #             player.rotational_speed = 0
-        #             player.position.x = SCREEN_WIDTH/2
-        #             player.position.y = SCREEN_HEIGHT/2
-        #             player.speed = 0
-        #             player.autocannon_magazine = AUTOCANNON_MAGAZINE_CAPACITY
-        #             player.shotgun_magazine = SHOTGUN_MAGAZINE_CAPACITY
-        #             player.autocannon_reload_timer = 0
-        #             player.shotgun_reload_timer = 0
+        for asteroid in asteroids:
+            if asteroid.collides_with(player):
+                if player_lives == 1:
+                    log_event("player_hit")
+                    print("Game over!")
+                    sys.exit()
+                else:
+                    player_lives -= 1
+                    for asteroid in asteroids:
+                        asteroid.kill()
+                    player.rotation = 0
+                    player.rotational_speed = 0
+                    player.position.x = SCREEN_WIDTH/2
+                    player.position.y = SCREEN_HEIGHT/2
+                    player.speed = 0
+                    player.autocannon_magazine = AUTOCANNON_MAGAZINE_CAPACITY
+                    player.shotgun_magazine = SHOTGUN_MAGAZINE_CAPACITY
+                    player.autocannon_reload_timer = 0
+                    player.shotgun_reload_timer = 0
 
         # Do collision detection on asteroids vs shots
         for asteroid in asteroids:
@@ -96,8 +96,14 @@ def main():
         lives_surface = font.render(f"Lives: {player_lives}", True, (255, 255, 255))
         player_speed_surface = font.render(f"LIN SPD: {player.speed:.2f}", True, (255, 255, 255))
         player_rotational_speed_surface = font.render(f"ROT SPD: {player.rotational_speed:.2f}", True, (255, 255, 255))
-        autocannon_rounds_surface = font.render(f"ATCN: {player.autocannon_magazine}", True, (255, 255, 255))
-        shotgun_rounds_surface = font.render(f"SHTGN: {player.shotgun_magazine}", True, (255, 255, 255))
+        if player.autocannon_magazine > 0:
+            autocannon_rounds_surface = font.render(f"ATCN: {player.autocannon_magazine}", True, (144, 238, 144))
+        else:
+            autocannon_rounds_surface = font.render(f"RELOADING ATCN: {player.autocannon_reload_timer:.0f}", True, (255, 165, 0))
+        if player.shotgun_magazine > 0:  
+            shotgun_rounds_surface = font.render(f"SHTGN: {player.shotgun_magazine}", True, (144, 238, 144))
+        else:
+            shotgun_rounds_surface = font.render(f"RELOADING SHTGN: {player.shotgun_reload_timer:.0f}", True, (255, 165, 0))
         screen.blit(score_surface, (20, 20))
         screen.blit(lives_surface, (20, 50))
         screen.blit(player_speed_surface, (20, 80))
