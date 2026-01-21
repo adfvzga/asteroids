@@ -1,10 +1,10 @@
 import pygame
-from constants import *
-from logger import log_state, log_event
-from player import Player
-from asteroid import Asteroid
-from asteroidfield import AsteroidField
-from shot import Shot
+from modules.constants import *
+from modules.logger import log_state, log_event
+from modules.player import Player
+from modules.asteroid import Asteroid
+from modules.asteroidfield import AsteroidField
+from modules.shot import Shot
 import sys
 import os
 
@@ -25,11 +25,11 @@ def main():
     font = pygame.font.Font(None, 36)
 
     # Load the background picture
-    background_surface = pygame.image.load('background_image.png')
+    background_surface = pygame.image.load('images/background_image.png')
 
     # Load the sounds
-    autocannon_snd = pygame.mixer.Sound("autocannon.wav")
-    shotgun_snd = pygame.mixer.Sound("shotgun.mp3")
+    autocannon_snd = pygame.mixer.Sound("sounds/autocannon.wav")
+    shotgun_snd = pygame.mixer.Sound("sounds/shotgun.mp3")
 
     autocannon_snd.set_volume(0.25)
     shotgun_snd.set_volume(0.35)

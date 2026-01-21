@@ -1,8 +1,8 @@
 import pygame
-from circleshape import CircleShape
-from constants import *
-from asteroid import *
-from logger import *
+from modules.circleshape import CircleShape
+from modules.constants import *
+from modules.asteroid import *
+from modules.logger import *
 import random
 
 

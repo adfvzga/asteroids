@@ -1,7 +1,7 @@
 import pygame
-from circleshape import CircleShape
-from shot import Shot
-from constants import *
+from modules.circleshape import CircleShape
+from modules.shot import Shot
+from modules.constants import *
 import random
 
 
