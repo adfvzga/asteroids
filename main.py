@@ -7,6 +7,7 @@ from modules.asteroidfield import AsteroidField
 from modules.shot import Shot
 import sys
 import os
+import time
 
 
 
@@ -30,9 +31,13 @@ def main():
     # Load the sounds
     autocannon_snd = pygame.mixer.Sound("sounds/autocannon.wav")
     shotgun_snd = pygame.mixer.Sound("sounds/shotgun.mp3")
+    lost_life_snd = pygame.mixer.Sound("sounds/lost_life.mp3")
+    lost_game_snd = pygame.mixer.Sound("sounds/game_lost.mp3")
 
     autocannon_snd.set_volume(0.25)
     shotgun_snd.set_volume(0.35)
+    lost_life_snd.set_volume(0.15)
+    lost_game_snd.set_volume(0.25)
 
     # Generate object containers 
     updatable = pygame.sprite.Group()
@@ -73,6 +78,8 @@ def main():
                 if player_lives == 1:
                     log_event("player_hit")
                     print("Game over!")
+                    lost_game_snd.play()
+                    time.sleep(1.5)
                     sys.exit()
                 else:
                     player_lives -= 1
@@ -87,6 +94,7 @@ def main():
                     player.shotgun_magazine = SHOTGUN_MAGAZINE_CAPACITY
                     player.autocannon_reload_timer = 0
                     player.shotgun_reload_timer = 0
+                    lost_life_snd.play()
 
         # Do collision detection on asteroids vs shots
         for asteroid in asteroids:
