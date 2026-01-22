@@ -22,6 +22,9 @@ class Player(CircleShape):
         self.autocannon_reload_timer = 0 
         self.shotgun_reload_timer = 0
 
+        # Player powerups
+        self.shield_powerup = False
+
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
@@ -32,6 +35,8 @@ class Player(CircleShape):
 
     def draw(self, screen):
         pygame.draw.polygon(screen, "purple", self.triangle(), LINE_WIDTH)
+        if self.shield_powerup is True:
+            pygame.draw.circle(screen, "blue", self.position, SHIELD_RADIUS, LINE_WIDTH)
 
     def accelerate_rotationally(self, dt):
         if dt > 0:

@@ -5,6 +5,8 @@ from modules.player import Player
 from modules.asteroid import Asteroid
 from modules.asteroidfield import AsteroidField
 from modules.shot import Shot
+from modules.shield_powerup import ShieldPowerUp
+from modules.speed_powerup import SpeedPowerUP
 import sys
 import os
 import time
@@ -34,6 +36,7 @@ def main():
     lost_life_snd = pygame.mixer.Sound("sounds/lost_life.mp3")
     lost_game_snd = pygame.mixer.Sound("sounds/game_lost.mp3")
 
+    # Configure the sounds 
     autocannon_snd.set_volume(0.25)
     shotgun_snd.set_volume(0.35)
     lost_life_snd.set_volume(0.15)
@@ -44,10 +47,14 @@ def main():
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
+    speed_powerups = pygame.sprite.Group()
+    shield_powerups = pygame.sprite.Group()
 
     Player.containers = (updatable, drawable)
     Asteroid.containers = (asteroids, updatable, drawable)
     Shot.containers = (shots, updatable, drawable)
+    SpeedPowerUP.containers = (speed_powerups, updatable, drawable)
+    ShieldPowerUp.containers = (shield_powerups, updatable, drawable)
     AsteroidField.containers = (updatable)
      
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -72,8 +79,9 @@ def main():
         # Update the positions of objects 
         updatable.update(dt)
 
-        # Do collision detection on player vs asteroids
+        # Do collision detection on asteroids
         for asteroid in asteroids:
+            # Asteroids vs player
             if asteroid.collides_with(player):
                 if player_lives == 1:
                     log_event("player_hit")
@@ -96,14 +104,41 @@ def main():
                     player.shotgun_reload_timer = 0
                     lost_life_snd.play()
 
-        # Do collision detection on asteroids vs shots
-        for asteroid in asteroids:
+            # Asteroids vs shots
             for shot in shots:
                 if asteroid.collides_with(shot):
                     player_score += 1
                     log_event("asteroid_shot")
                     shot.kill()
                     asteroid.split()
+
+        # Do collision detection on speed powerups
+        for speed_powerup in speed_powerups:
+            # Speed powerups vs player
+            if speed_powerup.collides_with(player):
+                speed_powerup.kill()
+                print("speed powerup activated")
+            # Speed powerups vs shots
+            for shot in shots:
+                if speed_powerup.collides_with(shot):
+                    shot.kill()
+                    speed_powerup.kill()
+                    print("speed powerup activated")
+
+        # Do collision detection on shield powerups
+        for shield_powerup in shield_powerups:
+            # Speed powerups vs player
+            if shield_powerup.collides_with(player):
+                shield_powerup.kill()
+                print("shield powerup activated")
+                player.shield_powerup = True
+            # Speed powerups vs shots
+            for shot in shots:
+                if shield_powerup.collides_with(shot):
+                    shot.kill()
+                    shield_powerup.kill()
+                    print("shield powerup activated")
+                    player.shield_powerup = True
 
         # Draw the screen
         screen.blit(background_surface, (0, 0))
