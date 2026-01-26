@@ -33,12 +33,16 @@ def main():
     # Load the sounds
     autocannon_snd = pygame.mixer.Sound("sounds/autocannon.wav")
     shotgun_snd = pygame.mixer.Sound("sounds/shotgun.mp3")
+    shield_powerup_snd = pygame.mixer.Sound("sounds/shield_powerup.mp3")
+    speed_powerup_snd = pygame.mixer.Sound("sounds/speed_powerup.mp3")
     lost_life_snd = pygame.mixer.Sound("sounds/lost_life.mp3")
     lost_game_snd = pygame.mixer.Sound("sounds/game_lost.mp3")
 
     # Configure the sounds 
     autocannon_snd.set_volume(0.25)
     shotgun_snd.set_volume(0.35)
+    shield_powerup_snd.set_volume(0.5)
+    speed_powerup_snd.set_volume(0.5)
     lost_life_snd.set_volume(0.15)
     lost_game_snd.set_volume(0.25)
 
@@ -82,27 +86,30 @@ def main():
         # Do collision detection on asteroids
         for asteroid in asteroids:
             # Asteroids vs player
-            if asteroid.collides_with(player):
-                if player_lives == 1:
-                    log_event("player_hit")
-                    print("Game over!")
-                    lost_game_snd.play()
-                    time.sleep(1.5)
-                    sys.exit()
-                else:
-                    player_lives -= 1
-                    for asteroid in asteroids:
-                        asteroid.kill()
-                    player.rotation = 0
-                    player.rotational_speed = 0
-                    player.position.x = SCREEN_WIDTH/2
-                    player.position.y = SCREEN_HEIGHT/2
-                    player.speed = 0
-                    player.autocannon_magazine = AUTOCANNON_MAGAZINE_CAPACITY
-                    player.shotgun_magazine = SHOTGUN_MAGAZINE_CAPACITY
-                    player.autocannon_reload_timer = 0
-                    player.shotgun_reload_timer = 0
-                    lost_life_snd.play()
+            if player.shield_powerup_timer > 0:
+                pass
+            else: 
+                if asteroid.collides_with(player):
+                    if player_lives == 1:
+                        log_event("player_hit")
+                        print("Game over!")
+                        lost_game_snd.play()
+                        time.sleep(1.5)
+                        sys.exit()
+                    else:
+                        player_lives -= 1
+                        for asteroid in asteroids:
+                            asteroid.kill()
+                        player.rotation = 0
+                        player.rotational_speed = 0
+                        player.position.x = SCREEN_WIDTH/2
+                        player.position.y = SCREEN_HEIGHT/2
+                        player.speed = 0
+                        player.autocannon_magazine = AUTOCANNON_MAGAZINE_CAPACITY
+                        player.shotgun_magazine = SHOTGUN_MAGAZINE_CAPACITY
+                        player.autocannon_reload_timer = 0
+                        player.shotgun_reload_timer = 0
+                        lost_life_snd.play()
 
             # Asteroids vs shots
             for shot in shots:
@@ -117,28 +124,30 @@ def main():
             # Speed powerups vs player
             if speed_powerup.collides_with(player):
                 speed_powerup.kill()
-                print("speed powerup activated")
+                speed_powerup_snd.play()
+                player.speed_powerup_timer = SPEED_POWERUP_ACTIVE_TIME_SECONDS
             # Speed powerups vs shots
             for shot in shots:
                 if speed_powerup.collides_with(shot):
                     shot.kill()
                     speed_powerup.kill()
-                    print("speed powerup activated")
+                    speed_powerup_snd.play()
+                    player.speed_powerup_timer = SPEED_POWERUP_ACTIVE_TIME_SECONDS
 
         # Do collision detection on shield powerups
         for shield_powerup in shield_powerups:
             # Speed powerups vs player
             if shield_powerup.collides_with(player):
                 shield_powerup.kill()
-                print("shield powerup activated")
-                player.shield_powerup = True
+                shield_powerup_snd.play()
+                player.shield_powerup_timer = SHIELD_POWERUP_ACTIVE_TIME_SECONDS
             # Speed powerups vs shots
             for shot in shots:
                 if shield_powerup.collides_with(shot):
                     shot.kill()
                     shield_powerup.kill()
-                    print("shield powerup activated")
-                    player.shield_powerup = True
+                    shield_powerup_snd.play()
+                    player.shield_powerup_timer = SHIELD_POWERUP_ACTIVE_TIME_SECONDS
 
         # Draw the screen
         screen.blit(background_surface, (0, 0))

@@ -23,7 +23,8 @@ class Player(CircleShape):
         self.shotgun_reload_timer = 0
 
         # Player powerups
-        self.shield_powerup = False
+        self.shield_powerup_timer = 0
+        self.speed_powerup_timer = 0
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -35,7 +36,7 @@ class Player(CircleShape):
 
     def draw(self, screen):
         pygame.draw.polygon(screen, "purple", self.triangle(), LINE_WIDTH)
-        if self.shield_powerup is True:
+        if self.shield_powerup_timer > 0:
             pygame.draw.circle(screen, "blue", self.position, SHIELD_RADIUS, LINE_WIDTH)
 
     def accelerate_rotationally(self, dt):
@@ -51,16 +52,17 @@ class Player(CircleShape):
                 self.rotational_speed = -PLAYER_MAX_ROTATION_SPEED
 
     def accelerate_linearly(self, dt):
+        max_speed = PLAYER_MAX_SPEED * 1.5 if self.speed_powerup_timer > 0 else PLAYER_MAX_SPEED
         if dt > 0:
-            if self.speed < PLAYER_MAX_SPEED:
+            if self.speed < max_speed:
                 self.speed += PLAYER_LINEAR_ACCELERATION * dt
             else:
-                self.speed = PLAYER_MAX_SPEED
+                self.speed = max_speed
         else:
-            if self.speed > -PLAYER_MAX_SPEED:
+            if self.speed > -max_speed:
                 self.speed += PLAYER_LINEAR_ACCELERATION * dt
             else:
-                self.speed = -PLAYER_MAX_SPEED
+                self.speed = -max_speed
 
     def shoot_autocannon(self):
         if self.autocannon_magazine != 0:
@@ -96,6 +98,12 @@ class Player(CircleShape):
 
         # Update cooldown and reload timers
         self.shotgun_cooldown -= dt
+
+        # Update powerup timers
+        if self.shield_powerup_timer > 0:
+            self.shield_powerup_timer -= dt
+        if self.speed_powerup_timer > 0:
+            self.speed_powerup_timer -= dt
 
         if self.autocannon_reload_timer > 0:
             self.autocannon_reload_timer -= dt
