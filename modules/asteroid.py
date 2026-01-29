@@ -10,9 +10,15 @@ class Asteroid(CircleShape):
     def __init__(self, x, y, radius):
         super().__init__(x,y,radius)
         self.shape = self.generate_shape()
+        self.rotation = 0
+        self.rotation_speed = random.randint(-ASTEROID_MAX_ROTATION_SPEED, ASTEROID_MAX_ROTATION_SPEED)
 
     def draw(self, screen):
         pygame.draw.polygon(screen, "white", self.update_shape(), LINE_WIDTH)
+
+    def update(self, dt):
+        super().update(dt)
+        self.rotation += self.rotation_speed * dt
 
     def split(self):
         self.kill()
@@ -45,5 +51,6 @@ class Asteroid(CircleShape):
     def update_shape(self):
         new_verteces = []
         for vertex in self.shape:
+           vertex = vertex.rotate(self.rotation)
            new_verteces.append(vertex + self.position)
         return new_verteces
