@@ -39,6 +39,7 @@ def main():
     speed_powerup_snd = pygame.mixer.Sound("sounds/speed_powerup.mp3")
     lost_life_snd = pygame.mixer.Sound("sounds/lost_life.mp3")
     lost_game_snd = pygame.mixer.Sound("sounds/game_lost.mp3")
+    pygame.mixer.music.load("sounds/background_music.mp3")
 
     # Configure the sounds 
     autocannon_snd.set_volume(0.25)
@@ -48,6 +49,8 @@ def main():
     speed_powerup_snd.set_volume(0.5)
     lost_life_snd.set_volume(0.15)
     lost_game_snd.set_volume(0.25)
+    pygame.mixer.music.set_volume(0.1)
+    pygame.mixer.music.play(-1)
 
     # Generate object containers 
     updatable = pygame.sprite.Group()
