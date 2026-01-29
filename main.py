@@ -1,6 +1,5 @@
 import pygame
 from modules.constants import *
-from modules.logger import log_state, log_event
 from modules.player import Player
 from modules.asteroid import Asteroid
 from modules.asteroidfield import AsteroidField
@@ -31,7 +30,7 @@ def main():
     # Load the background picture
     background_surface = pygame.image.load('images/background_image.png')
 
-    # Load the sounds
+    # Load the sounds and music 
     autocannon_snd = pygame.mixer.Sound("sounds/autocannon.wav")
     shotgun_snd = pygame.mixer.Sound("sounds/shotgun.mp3")
     bomb_snd = pygame.mixer.Sound("sounds/bomb.mp3")
@@ -41,7 +40,7 @@ def main():
     lost_game_snd = pygame.mixer.Sound("sounds/game_lost.mp3")
     pygame.mixer.music.load("sounds/background_music.mp3")
 
-    # Configure the sounds 
+    # Configure the sounds and music 
     autocannon_snd.set_volume(0.25)
     shotgun_snd.set_volume(0.35)
     bomb_snd.set_volume(0.6)
@@ -67,6 +66,7 @@ def main():
     ShieldPowerUp.containers = (shield_powerups, updatable, drawable)
     AsteroidField.containers = (updatable)
      
+    # Generate other static objects
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
     player = Player(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, autocannon_snd, shotgun_snd)
@@ -75,12 +75,9 @@ def main():
 
     # Gameplay variables
     player_score = 0
-    player_lives = 3
+    player_lives = PLAYER_LIVES
 
     while(1):
-        # Log game state at the beggining of each frame 
-        log_state()
-
         # Check if the user wants to quit the game 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -95,40 +92,32 @@ def main():
             if player.shield_powerup_timer > 0:
                 pass
             else: 
-                if asteroid.collides_with(player):
-                    if player_lives == 1:
-                        log_event("player_hit")
-                        print("Game over!")
-                        lost_game_snd.play()
-                        time.sleep(1.5)
-                        sys.exit()
-                    else:
-                        player_lives -= 1
-                        for asteroid in asteroids:
-                            asteroid.kill()
-                        player.rotation = 0
-                        player.rotational_speed = 0
-                        player.position.x = SCREEN_WIDTH/2
-                        player.position.y = SCREEN_HEIGHT/2
-                        player.speed = 0
-                        player.autocannon_magazine = AUTOCANNON_MAGAZINE_CAPACITY
-                        player.shotgun_magazine = SHOTGUN_MAGAZINE_CAPACITY
-                        player.bomb_magazine = BOMB_MAGAZINE_CAPACITY
-                        player.autocannon_reload_timer = 0
-                        player.shotgun_reload_timer = 0
-                        player.bomb_reload_timer = 0
-                        lost_life_snd.play()
+               if asteroid.collides_with(player):
+                   if player_lives == 1:
+                       print("Game over!")
+                       lost_game_snd.play()
+                       time.sleep(1.5)
+                       sys.exit()
+                   else:
+                       player_lives -= 1
+                       for asteroid in asteroids:
+                           asteroid.kill()
+                       # Kill the old player and create a new one immediately afterwards
+                       player.kill()
+                       player = Player(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, autocannon_snd, shotgun_snd)
+                       lost_life_snd.play()
 
             # Asteroids vs shots
             for shot in shots:
                 if asteroid.collides_with(shot):
                     player_score += 1
-                    log_event("asteroid_shot")
                     shot.kill()
                     asteroid.split()
                     if isinstance(shot, Bomb):
                         shot.explode()
                         bomb_snd.play()
+                    # Break the loop so that collisions are no longer calculated for the broken asteroid
+                    break
 
         # Do collision detection on speed powerups
         for speed_powerup in speed_powerups:
