@@ -1,6 +1,7 @@
 import pygame
 from modules.circleshape import CircleShape
 from modules.shot import Shot
+from modules.bomb import Bomb
 from modules.constants import *
 import random
 
@@ -18,9 +19,12 @@ class Player(CircleShape):
         # Armament
         self.autocannon_magazine = AUTOCANNON_MAGAZINE_CAPACITY
         self.shotgun_magazine = SHOTGUN_MAGAZINE_CAPACITY
+        self.bomb_magazine = BOMB_MAGAZINE_CAPACITY
         self.shotgun_cooldown = 0
         self.autocannon_reload_timer = 0 
         self.shotgun_reload_timer = 0
+        self.bomb_cooldown = 0
+        self.bomb_reload_timer = 0
 
         # Player powerups
         self.shield_powerup_timer = 0
@@ -77,19 +81,33 @@ class Player(CircleShape):
         
     def shoot_shotgun(self):
         if self.shotgun_magazine != 0:
-                if self.shotgun_cooldown > 0:
-                    pass
-                else:
-                    for i in range(0, SHOTGUN_PELLETS_PER_SHOT):
-                        shot = Shot(self.position.x, self.position.y, SHOTGUN_PROJECTILE_RADIUS)
-                        shot.velocity = pygame.Vector2(0,1)
-                        shot.velocity = shot.velocity.rotate(self.rotation + random.randint(-25, 25))
-                        shot.velocity *= SHOTGUN_PROJECTILE_SPEED + self.speed + random.randint(-50, 50)
-                    self.shotgun_magazine -= 1
-                    self.shotgun_cooldown = SHOTGUN_COOLDOWN_TIME_SECONDS
-                    self.shotgun_snd.play()
+            if self.shotgun_cooldown > 0:
+                pass
+            else:
+                for i in range(0, SHOTGUN_PELLETS_PER_SHOT):
+                    shot = Shot(self.position.x, self.position.y, SHOTGUN_PROJECTILE_RADIUS)
+                    shot.velocity = pygame.Vector2(0,1)
+                    shot.velocity = shot.velocity.rotate(self.rotation + random.randint(-25, 25))
+                    shot.velocity *= SHOTGUN_PROJECTILE_SPEED + self.speed + random.randint(-50, 50)
+                self.shotgun_magazine -= 1
+                self.shotgun_cooldown = SHOTGUN_COOLDOWN_TIME_SECONDS
+                self.shotgun_snd.play()
         else:
             self.shotgun_reload_timer = SHOTGUN_RELOAD_TIME_SECONDS
+
+    def dettach_bomb(self):
+        if self.bomb_magazine != 0:
+            if self.bomb_cooldown > 0:
+                pass
+            else:
+                bomb = Bomb(self.position.x, self.position.y, BOMB_RADIUS)
+                bomb.velocity = pygame.Vector2(0,1)
+                bomb.velocity = bomb.velocity.rotate(self.rotation)
+                bomb.velocity *= self.speed
+                self.bomb_magazine -= 1
+                self.bomb_cooldown = BOMB_COOLDOWN_TIME_SECONDS
+        else:
+            self.bomb_reload_timer = BOMB_RELOAD_TIME_SECONDS
 
     def update(self, dt):
         # Helper variables
@@ -98,6 +116,7 @@ class Player(CircleShape):
 
         # Update cooldown and reload timers
         self.shotgun_cooldown -= dt
+        self.bomb_cooldown -= dt
 
         # Update powerup timers
         if self.shield_powerup_timer > 0:
@@ -115,6 +134,11 @@ class Player(CircleShape):
             if self.shotgun_reload_timer <= 0:
                 self.shotgun_magazine = SHOTGUN_MAGAZINE_CAPACITY
 
+        if self.bomb_reload_timer > 0:
+            self.bomb_reload_timer -= dt
+            if self.bomb_reload_timer <= 0:
+                self.bomb_magazine = BOMB_MAGAZINE_CAPACITY
+
         # Check current player input and make adjustments
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
@@ -131,6 +155,8 @@ class Player(CircleShape):
             user_applying_linear_acceleration = True 
         if keys[pygame.K_j]:
             self.shoot_shotgun()
+        if keys[pygame.K_b]:
+            self.dettach_bomb()
         if keys[pygame.K_SPACE]:
             self.shoot_autocannon()
 

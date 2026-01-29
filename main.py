@@ -5,6 +5,7 @@ from modules.player import Player
 from modules.asteroid import Asteroid
 from modules.asteroidfield import AsteroidField
 from modules.shot import Shot
+from modules.bomb import Bomb
 from modules.shield_powerup import ShieldPowerUp
 from modules.speed_powerup import SpeedPowerUP
 import sys
@@ -33,6 +34,7 @@ def main():
     # Load the sounds
     autocannon_snd = pygame.mixer.Sound("sounds/autocannon.wav")
     shotgun_snd = pygame.mixer.Sound("sounds/shotgun.mp3")
+    bomb_snd = pygame.mixer.Sound("sounds/bomb.mp3")
     shield_powerup_snd = pygame.mixer.Sound("sounds/shield_powerup.mp3")
     speed_powerup_snd = pygame.mixer.Sound("sounds/speed_powerup.mp3")
     lost_life_snd = pygame.mixer.Sound("sounds/lost_life.mp3")
@@ -41,6 +43,7 @@ def main():
     # Configure the sounds 
     autocannon_snd.set_volume(0.25)
     shotgun_snd.set_volume(0.35)
+    bomb_snd.set_volume(0.6)
     shield_powerup_snd.set_volume(0.5)
     speed_powerup_snd.set_volume(0.5)
     lost_life_snd.set_volume(0.15)
@@ -107,8 +110,10 @@ def main():
                         player.speed = 0
                         player.autocannon_magazine = AUTOCANNON_MAGAZINE_CAPACITY
                         player.shotgun_magazine = SHOTGUN_MAGAZINE_CAPACITY
+                        player.bomb_magazine = BOMB_MAGAZINE_CAPACITY
                         player.autocannon_reload_timer = 0
                         player.shotgun_reload_timer = 0
+                        player.bomb_reload_timer = 0
                         lost_life_snd.play()
 
             # Asteroids vs shots
@@ -118,6 +123,9 @@ def main():
                     log_event("asteroid_shot")
                     shot.kill()
                     asteroid.split()
+                    if isinstance(shot, Bomb):
+                        shot.explode()
+                        bomb_snd.play()
 
         # Do collision detection on speed powerups
         for speed_powerup in speed_powerups:
@@ -169,12 +177,17 @@ def main():
             shotgun_rounds_surface = font.render(f"SHTGN: {player.shotgun_magazine}", True, (144, 238, 144))
         else:
             shotgun_rounds_surface = font.render(f"RELOADING SHTGN: {player.shotgun_reload_timer:.0f}", True, (255, 165, 0))
+        if player.bomb_magazine > 0:  
+            bombs_surface = font.render(f"BMBS: {player.bomb_magazine}", True, (144, 238, 144))
+        else:
+            bombs_surface = font.render(f"RELOADING BMBS: {player.bomb_reload_timer:.0f}", True, (255, 165, 0))
         screen.blit(score_surface, (20, 20))
         screen.blit(lives_surface, (20, 50))
         screen.blit(player_speed_surface, (20, 80))
         screen.blit(player_rotational_speed_surface, (20, 110))
         screen.blit(autocannon_rounds_surface, (20, 140))
         screen.blit(shotgun_rounds_surface, (20, 170))
+        screen.blit(bombs_surface, (20, 200))
 
         # Update the screen 
         pygame.display.flip()
