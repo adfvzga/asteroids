@@ -92,7 +92,7 @@ def main():
             if player.shield_powerup_timer > 0:
                 pass
             else: 
-               if asteroid.collides_with(player):
+               if player.collides_with(asteroid):
                    if player_lives == 1:
                        print("Game over!")
                        lost_game_snd.play()
@@ -122,7 +122,7 @@ def main():
         # Do collision detection on speed powerups
         for speed_powerup in speed_powerups:
             # Speed powerups vs player
-            if speed_powerup.collides_with(player):
+            if player.collides_with(speed_powerup):
                 speed_powerup.kill()
                 speed_powerup_snd.play()
                 player.speed_powerup_timer = SPEED_POWERUP_ACTIVE_TIME_SECONDS
@@ -137,7 +137,7 @@ def main():
         # Do collision detection on shield powerups
         for shield_powerup in shield_powerups:
             # Speed powerups vs player
-            if shield_powerup.collides_with(player):
+            if player.collides_with(shield_powerup):
                 shield_powerup.kill()
                 shield_powerup_snd.play()
                 player.shield_powerup_timer = SHIELD_POWERUP_ACTIVE_TIME_SECONDS

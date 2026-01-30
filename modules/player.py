@@ -187,3 +187,22 @@ class Player(CircleShape):
             self.position.y -= SCREEN_HEIGHT
         elif self.position.y < 0 - 2 * self.radius:
             self.position.y += SCREEN_HEIGHT
+
+    def collides_with(self, other): # Assumes the player is a triangle and the other body is a circle
+        a, b, c = self.triangle()
+        other_radius_squared = other.radius * other.radius
+
+        def closest_point_on_segment(a: pygame.Vector2, b: pygame.Vector2, p: pygame.Vector2) -> pygame.Vector2:
+            ab = b - a
+            ab_len2 = ab.length_squared()
+            if ab_len2 == 0:
+                return a  # a and b are the same point
+            t = (p - a).dot(ab) / ab_len2
+            t = max(0.0, min(1.0, t))
+            return a + ab * t
+
+        for a,b in ((a,b), (a,c), (b,c)):
+            closest_point = closest_point_on_segment(a, b, other.position)
+            if (other.position - closest_point).length_squared() <= other_radius_squared:
+                return True
+        return False
